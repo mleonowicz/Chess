@@ -1,19 +1,10 @@
 #include <gtk/gtk.h>
 #include <stdbool.h>
+#include "gameManager.h"
 
-typedef struct Position{
-    int x; 
-    int y;
-} Position;
-
-int pieces[8][8] = {4, 1, 0, 0, 0, 0, -1, -4, 
-                3, 1, 0, 0, 0, 0, -1, -3,
-                2, 1, 0, 0, 0, 0, -1, -2,
-                5, 1, 0, 0, 0, 0, -1, -5,
-                6, 1, 0, 0, 0, 0, -1, -6,
-                2, 1, 0, 0, 0, 0, -1, -2,
-                3, 1, 0, 0, 0, 0, -1, -3, 
-                4, 1, 0, 0, 0, 0, -1, -4,};
+bool clicked = false;
+Position clickedPiece;
+GtkButton *squares[8][8];
 
 void loadCSS() {
     GtkCssProvider *provider = gtk_css_provider_new();
@@ -30,14 +21,21 @@ void loadCSS() {
     g_object_unref(provider);
 }
 
-char *getPiece(int index) {
-    if (index == 0)
+/* 1 - pawn
+       2 - bishop
+       3 - knight
+       4 - rook
+       5 - queen
+       6 - king */
+
+char *getPiecePath(int index) {
+    if (index == 0)     
         return NULL;
 
     char color = index > 0 ? 'w' : 'b';
     index = index > 0 ? index : index * -1;
 
-    char *name;
+    char *name = malloc(sizeof(char) * 25);
 
     switch(index) {
         case 1:
@@ -63,21 +61,39 @@ char *getPiece(int index) {
     return name;
 }
 
+void placePieceImage(int piece, int x, int y) {
+    char *path = getPiecePath(piece);
+
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size(path, 100, 100, NULL);
+    GtkImage *image = (GtkImage *)gtk_image_new_from_pixbuf(pixbuf);
+    gtk_button_set_image((GtkButton *)squares[x][y], (GtkWidget *)image);
+
+    free(path);
+}
+
 void button_clicked(GtkWidget *widget, gpointer data) {
     Position *a = (Position *)data; 
-    printf("%d\n", pieces[a->x][a->y]);
+    int piece = pieces[a->x][a->y];
+
+    if (piece == 0) {
+        placePieceImage(4, a->x, a->y);
+    }
+
+
+    if (piece != 0) {
+        clickedPiece.x = a->x;
+        clickedPiece.y = a->y;
+    }
+    else {
+        clickedPiece.x = -1;
+        clickedPiece.y = -1;
+    }
+
+    printf("%d\n", piece);
 }
 
 int main(int argc, char **argv) {
     GtkWidget *window, *chessboard, *button;
-    GtkButton *squares[8][8];
-
-    /* 1 - pawn
-       2 - bishop
-       3 - knight
-       4 - rook
-       5 - queen
-       6 - king */
 
     Position cords[8][8];
 
@@ -110,21 +126,17 @@ int main(int argc, char **argv) {
 
     for (int x = 0; x < 8; x++)
         for (int y = 0; y < 2; y++) {
-            GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size(getPiece(pieces[x][y]), 100, 100, NULL);
-            GtkImage *image = (GtkImage *)gtk_image_new_from_pixbuf(pixbuf);
-            gtk_button_set_image((GtkButton *)squares[x][y], (GtkWidget *)image);
+            placePieceImage(pieces[x][y], x, y);
         }
 
     for (int x = 0; x < 8; x++)
         for (int y = 6; y < 8; y++) {
-            GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size(getPiece(pieces[x][y]), 100, 100, NULL);
-            GtkImage *image = (GtkImage *)gtk_image_new_from_pixbuf(pixbuf);
-            gtk_button_set_image((GtkButton *)squares[x][y], (GtkWidget *)image);
+            placePieceImage(pieces[x][y], x, y);
         }
     
     gtk_container_add(GTK_CONTAINER(window), chessboard);
     gtk_widget_show_all(window);
     gtk_main();
-
+    
     return 0;
 }
