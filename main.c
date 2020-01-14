@@ -6,6 +6,15 @@ typedef struct Position{
     int y;
 } Position;
 
+int pieces[8][8] = {4, 1, 0, 0, 0, 0, -1, -4, 
+                3, 1, 0, 0, 0, 0, -1, -3,
+                2, 1, 0, 0, 0, 0, -1, -2,
+                5, 1, 0, 0, 0, 0, -1, -5,
+                6, 1, 0, 0, 0, 0, -1, -6,
+                2, 1, 0, 0, 0, 0, -1, -2,
+                3, 1, 0, 0, 0, 0, -1, -3, 
+                4, 1, 0, 0, 0, 0, -1, -4,};
+
 void loadCSS() {
     GtkCssProvider *provider = gtk_css_provider_new();
     GdkDisplay *display = gdk_display_get_default();
@@ -56,7 +65,7 @@ char *getPiece(int index) {
 
 void button_clicked(GtkWidget *widget, gpointer data) {
     Position *a = (Position *)data; 
-    printf("%d %d\n", a->x, a->y);
+    printf("%d\n", pieces[a->x][a->y]);
 }
 
 int main(int argc, char **argv) {
@@ -71,14 +80,6 @@ int main(int argc, char **argv) {
        6 - king */
 
     Position cords[8][8];
-    int pieces[8][8] = {4, 1, 0, 0, 0, 0, -1, -4, 
-                3, 1, 0, 0, 0, 0, -1, -3,
-                2, 1, 0, 0, 0, 0, -1, -2,
-                5, 1, 0, 0, 0, 0, -1, -5,
-                6, 1, 0, 0, 0, 0, -1, -6,
-                2, 1, 0, 0, 0, 0, -1, -2,
-                3, 1, 0, 0, 0, 0, -1, -3, 
-                4, 1, 0, 0, 0, 0, -1, -4,};
 
     gtk_init(&argc, &argv);
 
@@ -101,8 +102,7 @@ int main(int argc, char **argv) {
             cords[x][y].x = x;
             cords[x][y].y = y;
 
-            g_signal_connect (button, "clicked",
-                        G_CALLBACK(button_clicked), &cords[x][y]);
+            g_signal_connect (button, "clicked", G_CALLBACK(button_clicked), &cords[x][y]);
 
             squares[x][y] = (GtkButton *)button;
             gtk_grid_attach((GtkGrid *)chessboard, button, x, y, 1, 1);
