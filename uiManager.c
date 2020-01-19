@@ -1,10 +1,9 @@
-#include <gtk/gtk.h>
-#include <stdbool.h>
+#include "uiManager.h"
 #include "gameManager.h"
 
-bool clicked = false;
-Position clickedPiece;
+Position cords[8][8];
 GtkButton *squares[8][8];
+GtkWidget *window, *chessboard, *button;
 
 void loadCSS() {
     GtkCssProvider *provider = gtk_css_provider_new();
@@ -21,7 +20,7 @@ void loadCSS() {
     g_object_unref(provider);
 }
 
-/* 1 - pawn
+/*     1 - pawn
        2 - bishop
        3 - knight
        4 - rook
@@ -71,38 +70,28 @@ void placePieceImage(int piece, int x, int y) {
     free(path);
 }
 
-void button_clicked(GtkWidget *widget, gpointer data) {
-    Position *a = (Position *)data; 
-    int piece = pieces[a->x][a->y];
-
-    if (piece == 0) {
-        placePieceImage(4, a->x, a->y);
-    }
-
-
-    if (piece != 0) {
-        clickedPiece.x = a->x;
-        clickedPiece.y = a->y;
-    }
-    else {
-        clickedPiece.x = -1;
-        clickedPiece.y = -1;
-    }
-
-    printf("%d\n", piece);
+void removePieceImage(int x, int y) {
+    gtk_button_set_image((GtkButton *)squares[x][y], NULL);
 }
 
-int main(int argc, char **argv) {
-    GtkWidget *window, *chessboard, *button;
+void button_clicked(GtkWidget *widget, gpointer data) {
+    Position *a = (Position *)data; 
+    handleClick(*a);
+}
 
-    Position cords[8][8];
+void initPieces() {
+    for (int x = 0; x < 8; x++)
+        for (int y = 0; y < 2; y++) {
+            placePieceImage(pieces[x][y], x, y);
+        }
 
-    gtk_init(&argc, &argv);
+    for (int x = 0; x < 8; x++)
+        for (int y = 6; y < 8; y++) {
+            placePieceImage(pieces[x][y], x, y);
+        }
+}
 
-    loadCSS();
-    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_resizable((GtkWindow *)window, FALSE);
-
+void initBoard() {
     chessboard = gtk_grid_new();
     
     for (int y = 0; y < 8; y++) 
@@ -118,22 +107,23 @@ int main(int argc, char **argv) {
             cords[x][y].x = x;
             cords[x][y].y = y;
 
-            g_signal_connect (button, "clicked", G_CALLBACK(button_clicked), &cords[x][y]);
+            g_signal_connect(button, "clicked", G_CALLBACK(button_clicked), &cords[x][y]);
 
             squares[x][y] = (GtkButton *)button;
             gtk_grid_attach((GtkGrid *)chessboard, button, x, y, 1, 1);
         }
+}
 
-    for (int x = 0; x < 8; x++)
-        for (int y = 0; y < 2; y++) {
-            placePieceImage(pieces[x][y], x, y);
-        }
+int main(int argc, char **argv) {
+    gtk_init(&argc, &argv);
 
-    for (int x = 0; x < 8; x++)
-        for (int y = 6; y < 8; y++) {
-            placePieceImage(pieces[x][y], x, y);
-        }
+    loadCSS();
+    window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_resizable((GtkWindow *)window, FALSE);
     
+    initBoard();
+    initPieces();
+
     gtk_container_add(GTK_CONTAINER(window), chessboard);
     gtk_widget_show_all(window);
     gtk_main();
