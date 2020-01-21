@@ -19,14 +19,12 @@ void loadCSS() {
 
     g_object_unref(provider);
 }
-
 /*     1 - pawn
        2 - bishop
        3 - knight
        4 - rook
        5 - queen
        6 - king */
-
 char *getPiecePath(int index) {
     if (index == 0)     
         return NULL;

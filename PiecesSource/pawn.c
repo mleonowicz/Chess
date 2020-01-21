@@ -1,5 +1,4 @@
 #include "pawn.h"
-#include <stdio.h>
 
 bool legalMovePawn(Position from, Position to, bool attacking) {
     bool firstMove = false;
@@ -24,7 +23,7 @@ bool legalMovePawn(Position from, Position to, bool attacking) {
     
     int offset = from.x - to.x;
 
-    if (attacking && (offset == -1 || offset == 1)) {
+    if (attacking && (offset == -1 || offset == 1)) { // attacking
         int offset = from.y - to.y;
 
         if (turn == 1) 

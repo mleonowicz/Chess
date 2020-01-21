@@ -13,6 +13,7 @@ extern int turn; // 1 if white, -1 if black
 extern int selectedPiece;
 Position selectedPiecePos;
 
+int absolute();
 bool sameSign();
 bool opposeSign();
 void printBoard();

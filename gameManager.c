@@ -2,6 +2,7 @@
 #include "gameManager.h"
 #include "uiManager.h"
 #include "PiecesSource/pawn.h"
+#include "PiecesSource/bishop.h"
 
 int pieces[8][8] = { {4, 1, 0, 0, 0, 0, -1, -4}, 
                 {3, 1, 0, 0, 0, 0, -1, -3},
@@ -19,7 +20,10 @@ Position selectedPiecePos;
 void printBoard() {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            printf("%d ", pieces[j][i]);
+            if (pieces[j][i] < 0)
+                printf("%d ", pieces[j][i]);
+            else 
+                printf("%d  ", pieces[j][i]);
         }
         putchar('\n');
     }
@@ -60,7 +64,10 @@ void handleClick(Position pos) {
                 if (legalMovePawn(selectedPiecePos, pos, attacking(pos)))
                     makeMove(pos);
             break;
-
+            case 2:
+                if (legalMoveBishop(selectedPiecePos, pos))
+                    makeMove(pos);                
+            break;
             default:
                makeMove(pos);
             break;
