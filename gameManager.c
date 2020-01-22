@@ -3,6 +3,7 @@
 #include "uiManager.h"
 #include "PiecesSource/pawn.h"
 #include "PiecesSource/bishop.h"
+#include "PiecesSource/rook.h"
 
 int pieces[8][8] = { {4, 1, 0, 0, 0, 0, -1, -4}, 
                 {3, 1, 0, 0, 0, 0, -1, -3},
@@ -67,6 +68,10 @@ void handleClick(Position pos) {
             case 2:
                 if (legalMoveBishop(selectedPiecePos, pos))
                     makeMove(pos);                
+            break;
+            case 4:
+                if (legalMoveRook(selectedPiecePos, pos))
+                    makeMove(pos);
             break;
             default:
                makeMove(pos);
