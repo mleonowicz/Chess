@@ -3,16 +3,20 @@
 #include "uiManager.h"
 #include "PiecesSource/pawn.h"
 #include "PiecesSource/bishop.h"
+#include "PiecesSource/knight.h"
 #include "PiecesSource/rook.h"
+#include "PiecesSource/king.h"
 
-int pieces[8][8] = { {4, 1, 0, 0, 0, 0, -1, -4}, 
+int pieces[8][8] = { 
+                {4, 1, 0, 0, 0, 0, -1, -4}, 
                 {3, 1, 0, 0, 0, 0, -1, -3},
                 {2, 1, 0, 0, 0, 0, -1, -2},
                 {5, 1, 0, 0, 0, 0, -1, -5},
                 {6, 1, 0, 0, 0, 0, -1, -6},
                 {2, 1, 0, 0, 0, 0, -1, -2},
                 {3, 1, 0, 0, 0, 0, -1, -3}, 
-                {4, 1, 0, 0, 0, 0, -1, -4} };
+                {4, 1, 0, 0, 0, 0, -1, -4} 
+                };
 
 int turn = 1;
 int selectedPiece = 0;
@@ -51,10 +55,28 @@ bool opposeSign(int n, int m)
     return (n > 0 && m < 0) || (n < 0 && m > 0);
 }
 
+bool checkCastle(int newPiece) {
+    if (absolute(selectedPiece) == 4 && absolute(newPiece) == 6) {
+        
+    }
+
+    else if (absolute(selectedPiece) == 6 && absolute(newPiece == 4)) {
+        
+    }
+        
+
+}
+
 void handleClick(Position pos) {
     int piece = pieces[pos.x][pos.y];
 
     if (sameSign(piece, turn)) {
+        
+        // if (checkCastle) {
+        //     castle();
+        //     return;
+        // }
+        
         selectedPiecePos = pos;
         selectedPiece = piece;
     }
@@ -69,8 +91,20 @@ void handleClick(Position pos) {
                 if (legalMoveBishop(selectedPiecePos, pos))
                     makeMove(pos);                
             break;
+            case 3:
+                if (legalMoveKnight(selectedPiecePos, pos))
+                    makeMove(pos);
+            break;
             case 4:
                 if (legalMoveRook(selectedPiecePos, pos))
+                    makeMove(pos);
+            break;
+            case 5: 
+                if (legalMoveRook(selectedPiecePos, pos) || legalMoveBishop(selectedPiecePos, pos)) // queen movement is same as rook and bishop
+                    makeMove(pos);
+            break;
+            case 6:
+                if (legalMoveKing(selectedPiecePos, pos))
                     makeMove(pos);
             break;
             default:

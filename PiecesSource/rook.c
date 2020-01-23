@@ -1,6 +1,32 @@
 #include "rook.h"
 #include <stdio.h>
 
+bool rookMoved[2][2] = { 
+        {false, false},
+        {false, false} 
+        };
+/*
+    0,0 - left white
+    0,1 - right white
+    1,0 - left black
+    1,1 - right black
+*/
+
+void checkIfFirstMove(Position from) {
+    if (from.x == 0) {
+        if (from.y == 0)
+            rookMoved[0][0] = true;
+        else if (from.y == 7)
+            rookMoved[0][1] = true;
+    }
+    else if (from.x == 7) {
+        if (from.y == 0)
+            rookMoved[0][1] = true;
+        else if (from.y == 7)
+            rookMoved[1][1] = true;
+    }
+}
+
 bool legalMoveRook(Position from, Position to) {
     
     int offsetX = to.x - from.x;
@@ -23,17 +49,22 @@ bool legalMoveRook(Position from, Position to) {
 
     int count = absolute(offsetY) > absolute(offsetX) ? absolute(offsetY) : absolute(offsetX);
 
-    from.x += x;
-    from.y += y;
+    int newX = from.x;
+    int newY = from.y;
+
+    newX += x;
+    newY += y;
     count--;
 
     while (count-- > 0) {
-        if (pieces[from.x][from.y] != 0)
+        if (pieces[newX][newY] != 0)
             return false;
 
-        from.x += x;
-        from.y += y;
+        newX += x;
+        newY += y;
     }
+    
+    checkIfFirstMove(from);
 
     return true;
 }   
