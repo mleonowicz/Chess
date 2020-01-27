@@ -55,28 +55,36 @@ bool opposeSign(int n, int m)
     return (n > 0 && m < 0) || (n < 0 && m > 0);
 }
 
-bool checkCastle(int newPiece) {
+bool checkCastle(int newPiece, Position pos) {
     if (absolute(selectedPiece) == 4 && absolute(newPiece) == 6) {
-        
+        if (turn == 1) {
+            if (!whiteKingMoved) {
+                
+            }
+        }
     }
 
     else if (absolute(selectedPiece) == 6 && absolute(newPiece == 4)) {
         
     }
-        
 
+    return false;
+}
+
+void castle(Position k, Position r) {
+    
+    
+    turn *= -1;
 }
 
 void handleClick(Position pos) {
     int piece = pieces[pos.x][pos.y];
-
+    
     if (sameSign(piece, turn)) {
-        
-        // if (checkCastle) {
-        //     castle();
-        //     return;
-        // }
-        
+
+        if(checkCastle(piece, pos))
+            return;
+
         selectedPiecePos = pos;
         selectedPiece = piece;
     }

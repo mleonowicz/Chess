@@ -12,19 +12,40 @@ bool rookMoved[2][2] = {
     1,1 - right black
 */
 
-void checkIfFirstMove(Position from) {
+bool *mapRook(Position from) {
+    bool *b = NULL;
+
     if (from.x == 0) {
         if (from.y == 0)
-            rookMoved[0][0] = true;
+            b = &rookMoved[0][0];
         else if (from.y == 7)
-            rookMoved[0][1] = true;
+            b = &rookMoved[0][1];
     }
     else if (from.x == 7) {
         if (from.y == 0)
-            rookMoved[0][1] = true;
+            b = &rookMoved[0][1];
         else if (from.y == 7)
-            rookMoved[1][1] = true;
+            b = &rookMoved[1][1];
     }
+
+    return b;
+}
+
+void checkIfFirstMove(Position from) {
+    if ((from.x != 0 || (from.y != 0 && from.y != 7)) 
+    && (from.x != 7 || (from.y != 0 && from.y != 7))) 
+        return;
+
+    bool *b = mapRook(from);
+    *b = true;
+}
+
+bool checkIfMoved(Position from) {
+    if ((from.x != 0 || (from.y != 0 && from.y != 7)) 
+    && (from.x != 7 || (from.y != 0 && from.y != 7))) 
+        return true;
+
+    return *mapRook(from);
 }
 
 bool legalMoveRook(Position from, Position to) {

@@ -7,6 +7,7 @@
 extern bool whiteKingMoved;
 extern bool blackKingMoved;
 
+bool checkIfMoved(Position);
 bool legalMoveKing(Position, Position);
 
 #endif
