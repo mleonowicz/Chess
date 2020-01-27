@@ -55,26 +55,67 @@ bool opposeSign(int n, int m)
     return (n > 0 && m < 0) || (n < 0 && m > 0);
 }
 
+void castle(Position k, Position r) {
+    Position newKing;
+    Position newRook;
+
+    newKing.y = k.y;
+    newRook.y = r.y;
+
+    int x = (k.x - r.x) > 0 ? -1 : 1;
+    newKing.x = k.x + x + x;
+    newRook.x = r.x - x - x;
+
+    if (newRook.x == newKing.x)
+        newKing.x += x;
+
+    makeMove(k, newKing);
+    makeMove(r, newRook);
+}
+
 bool checkCastle(int newPiece, Position pos) {
+    Position kingPos;
+    Position rookPos;
+
     if (absolute(selectedPiece) == 4 && absolute(newPiece) == 6) {
+        kingPos = pos;
+        rookPos = selectedPiecePos;
+    }
+    else if (absolute(newPiece) == 4 && absolute(selectedPiece) == 6) {
+        kingPos = selectedPiecePos;
+        rookPos = pos;
+    }
+    else 
+        return false;
+
+    int x = (kingPos.x - rookPos.x) > 0 ? -1 : 1;
+    int y = kingPos.y;
+
+    int newX = kingPos.x + x;
+
+    while (newX != rookPos.x) {
+        if (pieces[newX][y] != 0)
+            return false;
+
+        newX += x;
+    }
+
+    if (!checkIfRookMoved(rookPos)) {
         if (turn == 1) {
             if (!whiteKingMoved) {
-                
+                castle(kingPos, rookPos);
+                return true;
+            }
+        }
+        else {
+            if (!blackKingMoved) {
+                castle(kingPos, rookPos);
+                return true;
             }
         }
     }
 
-    else if (absolute(selectedPiece) == 6 && absolute(newPiece == 4)) {
-        
-    }
-
     return false;
-}
-
-void castle(Position k, Position r) {
-    
-    
-    turn *= -1;
 }
 
 void handleClick(Position pos) {
@@ -82,8 +123,10 @@ void handleClick(Position pos) {
     
     if (sameSign(piece, turn)) {
 
-        if(checkCastle(piece, pos))
+        if(checkCastle(piece, pos)) {
+            turn *= -1;
             return;
+        }
 
         selectedPiecePos = pos;
         selectedPiece = piece;
@@ -93,42 +136,41 @@ void handleClick(Position pos) {
         switch(absolute(selectedPiece)) {
             case 1:
                 if (legalMovePawn(selectedPiecePos, pos, attacking(pos)))
-                    makeMove(pos);
+                    makeMove(selectedPiecePos, pos);
             break;
             case 2:
                 if (legalMoveBishop(selectedPiecePos, pos))
-                    makeMove(pos);                
+                    makeMove(selectedPiecePos, pos);                
             break;
             case 3:
                 if (legalMoveKnight(selectedPiecePos, pos))
-                    makeMove(pos);
+                    makeMove(selectedPiecePos, pos);
             break;
             case 4:
                 if (legalMoveRook(selectedPiecePos, pos))
-                    makeMove(pos);
+                    makeMove(selectedPiecePos, pos);
             break;
             case 5: 
                 if (legalMoveRook(selectedPiecePos, pos) || legalMoveBishop(selectedPiecePos, pos)) // queen movement is same as rook and bishop
-                    makeMove(pos);
+                    makeMove(selectedPiecePos, pos);
             break;
             case 6:
                 if (legalMoveKing(selectedPiecePos, pos))
-                    makeMove(pos);
-            break;
-            default:
-               makeMove(pos);
+                    makeMove(selectedPiecePos, pos);
             break;
         }
+
+        turn *= -1;
     }
 }
 
-void makeMove(Position pos) {
-    movePiece(selectedPiecePos, pos);
-    removePieceImage(selectedPiecePos.x, selectedPiecePos.y);
-    placePieceImage(selectedPiece, pos.x, pos.y);
+void makeMove(Position from, Position to) {
+    movePiece(from, to);
+    removePieceImage(from.x, from.y);
+    placePieceImage(pieces[to.x][to.y], to.x, to.y);
     selectedPiece = 0;
 
-    turn *= -1;
+    // turn *= -1;
 }
 
 void movePiece(Position from, Position to) {

@@ -5,5 +5,6 @@
 #include "../gameManager.h"
 
 bool legalMoveRook(Position, Position);
+bool checkIfRookMoved(Position);
 
 #endif

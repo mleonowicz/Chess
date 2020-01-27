@@ -17,7 +17,7 @@ int absolute();
 bool sameSign();
 bool opposeSign();
 void printBoard();
-void makeMove(Position);
+void makeMove(Position, Position);
 void movePiece(Position, Position);
 void handleClick(Position);
 

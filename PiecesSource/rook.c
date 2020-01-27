@@ -40,7 +40,7 @@ void checkIfFirstMove(Position from) {
     *b = true;
 }
 
-bool checkIfMoved(Position from) {
+bool checkIfRookMoved(Position from) {
     if ((from.x != 0 || (from.y != 0 && from.y != 7)) 
     && (from.x != 7 || (from.y != 0 && from.y != 7))) 
         return true;
