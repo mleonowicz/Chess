@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "gtk.h": "c",
+        "gamemanager.h": "c",
+        "stdbool.h": "c",
+        "uimanager.h": "c",
+        "pawn.h": "c",
+        "stdio.h": "c",
+        "bishop.h": "c",
+        "knight.h": "c",
+        "king.h": "c"
+    }
+}
