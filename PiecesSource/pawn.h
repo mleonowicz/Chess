@@ -4,6 +4,6 @@
 #include <stdbool.h>
 #include "../gameManager.h"
 
-bool legalMovePawn(Position, Position, bool);
+bool legalMovePawn(Position, Position, bool, int);
 
 #endif

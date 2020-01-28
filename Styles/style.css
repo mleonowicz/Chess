@@ -10,14 +10,14 @@ button {
     background-color: rgb(109, 154, 184);
 }
 
-#black:active {
-    background-color: rgb(109, 154, 184);
-}
-
 #white {
     background-color: rgb(196, 196, 196);
 }
 
-#white:active {
-    background-color: rgb(196, 196, 196);
+#whiteSelected {
+    background-color: rgb(137, 202, 175);
+}
+
+#blackSelected {
+    background-color: rgb(137, 202, 175);
 }

@@ -25,6 +25,7 @@ void loadCSS() {
        4 - rook
        5 - queen
        6 - king */
+       
 char *getPiecePath(int index) {
     if (index == 0)     
         return NULL;
@@ -87,7 +88,28 @@ void initPieces() {
         for (int y = 6; y < 8; y++) {
             placePieceImage(pieces[x][y], x, y);
         }
-}
+} 
+
+void setStyleSelected(int x, int y, bool selected) {
+    GtkWidget *button = (GtkWidget *)squares[x][y];
+
+    const gchar *name = gtk_widget_get_name(button);
+
+    if (selected) {
+        if (name[0] == 'w') 
+            gtk_widget_set_name(button, "whiteSelected");
+        else {
+            gtk_widget_set_name(button, "blackSelected");
+        }
+    }
+    else {
+        if (name[0] == 'w') 
+            gtk_widget_set_name(button, "white");
+        else {
+            gtk_widget_set_name(button, "black");
+        }
+    }
+} 
 
 void initBoard() {
     chessboard = gtk_grid_new();
@@ -124,6 +146,8 @@ int main(int argc, char **argv) {
 
     gtk_container_add(GTK_CONTAINER(window), chessboard);
     gtk_widget_show_all(window);
+
+    initialize();
     gtk_main();
     
     return 0;
