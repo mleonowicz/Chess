@@ -48,6 +48,10 @@ bool checkIfRookMoved(Position from) {
     return *mapRook(from);
 }
 
+void movedRook(Position from) {
+    checkIfFirstMove(from);
+}
+
 bool legalMoveRook(Position from, Position to) {
     
     int offsetX = to.x - from.x;
@@ -84,8 +88,6 @@ bool legalMoveRook(Position from, Position to) {
         newX += x;
         newY += y;
     }
-    
-    checkIfFirstMove(from);
 
     return true;
 }   

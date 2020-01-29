@@ -137,7 +137,7 @@ bool checkCastle(int newPiece, Position pos) {
 
     int newX = kingPos.x + x;
 
-    while (newX != rookPos.x) {
+    while (newX != rookPos.x) { // checking if there are pieces between rook and king
         if (pieces[newX][y] != 0)
             return false;
 
@@ -197,16 +197,20 @@ void handleClick(Position pos) {
                     correctMove = true;
             break;
             case 4:
-                if (legalMoveRook(selectedPiecePos, pos))
+                if (legalMoveRook(selectedPiecePos, pos)) {
+                    movedRook(selectedPiecePos);
                     correctMove = true;
+                }
             break;
             case 5: 
                 if (legalMoveRook(selectedPiecePos, pos) || legalMoveBishop(selectedPiecePos, pos)) // queen movement is same as rook and bishop
                     correctMove = true;
             break;
             case 6:
-                if (legalMoveKing(selectedPiecePos, pos))
+                if (legalMoveKing(selectedPiecePos, pos)) {
+                    movedKing(turn, pos);
                     correctMove = true;
+                }
             break;
         }
 
@@ -221,9 +225,7 @@ void handleClick(Position pos) {
             printf("\n");
             fflush(stdout);
         }
-        
     }
-    
 }
 
 void placePiece(Position from, Position to) {
