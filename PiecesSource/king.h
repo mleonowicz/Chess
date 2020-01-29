@@ -7,7 +7,8 @@
 extern bool whiteKingMoved;
 extern bool blackKingMoved;
 
-void movedKing(int, Position);
+void kingMoved(int);
+void changeKingPos(int, Position);
 bool legalMoveKing(Position, Position);
 
 #endif

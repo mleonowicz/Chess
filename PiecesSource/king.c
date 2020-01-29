@@ -7,14 +7,19 @@ bool blackKingMoved = false;
 Position whiteKing;
 Position blackKing;
 
-void movedKing(int t, Position to) { // t stands for turn, 1 - white, -1 black
-    if (t == 1) {
+void kingMoved(int t) {
+    if (t == 1) 
         whiteKingMoved = true;
+    else
+        blackKingMoved = true;
+}
+
+void changeKingPos(int t, Position to) { // t stands for turn, 1 - white, -1 black
+    if (t == 1) {
         whiteKing.x = to.x;
         whiteKing.y = to.y;
     }
     else {
-        blackKingMoved = true;
         blackKing.x = to.x;
         blackKing.y = to.y;
     }

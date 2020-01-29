@@ -112,7 +112,9 @@ void castle(Position k, Position r) {
         newKing.x += x;
 
     placePiece(k, newKing);
+    changeKingPos(turn, newKing);
     placePiece(r, newRook);
+    movedRook(newRook);
 
     turn *= -1;
 }
@@ -147,14 +149,14 @@ bool checkCastle(int newPiece, Position pos) {
     if (!checkIfRookMoved(rookPos)) {
         if (turn == 1) {
             if (!whiteKingMoved) {
+                kingMoved(turn);
                 castle(kingPos, rookPos);
-                whiteKingMoved = true;
                 return true;
             }
         }
         else {
             if (!blackKingMoved) {
-                blackKingMoved = true;
+                kingMoved(turn);
                 castle(kingPos, rookPos);
                 return true;
             }
@@ -168,10 +170,8 @@ void handleClick(Position pos) {
     int piece = pieces[pos.x][pos.y];
     if (sameSign(piece, turn)) {
 
-        if(checkCastle(piece, pos)) {
-            turn *= -1;
+        if(checkCastle(piece, pos))
             return;
-        }
 
         setStyleSelected(selectedPiecePos.x, selectedPiecePos.y, false);
         setStyleSelected(pos.x, pos.y, true);
@@ -198,7 +198,7 @@ void handleClick(Position pos) {
             break;
             case 4:
                 if (legalMoveRook(selectedPiecePos, pos)) {
-                    movedRook(selectedPiecePos);
+                    // movedRook(selectedPiecePos);
                     correctMove = true;
                 }
             break;
@@ -208,23 +208,49 @@ void handleClick(Position pos) {
             break;
             case 6:
                 if (legalMoveKing(selectedPiecePos, pos)) {
-                    movedKing(turn, pos);
+                    // movedKing(turn, pos);
                     correctMove = true;
                 }
             break;
         }
 
-        if (correctMove) {
+        if (correctMove) { // checkin if move would put king in a check
+            bool illegalMove = false;
+
+            int tempPiece = pieces[pos.x][pos.y];
+            movePiece(selectedPiecePos, pos);
+
+            if (absolute(selectedPiece) == 6)
+                changeKingPos(turn, pos);   
+
+            if (turn == 1) {
+                if (isTileAttacked(whiteKing, -1))
+                    illegalMove = true;
+            }
+            else {
+                if (isTileAttacked(blackKing, 1))
+                    illegalMove = true;
+            }
+
+            movePiece(pos, selectedPiecePos);
+            pieces[pos.x][pos.y] = tempPiece;
+
+            if (illegalMove) {
+                if (absolute(selectedPiece) == 6)
+                    changeKingPos(turn, selectedPiecePos);
+
+                return;
+            }
+
+            if (absolute(selectedPiece) == 6)
+                kingMoved(turn);
+            else if (absolute(selectedPiece) == 4)
+                movedRook(selectedPiecePos);
+            
             makeMove(selectedPiecePos, pos);
-
-            if (isTileAttacked(blackKing, 1))
-                printf("Black king attacked ");
-            if (isTileAttacked(whiteKing, -1))
-                printf("White king attacked");
-
-            printf("\n");
-            fflush(stdout);
         }
+
+        printBoard();
     }
 }
 
