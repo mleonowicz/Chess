@@ -13,6 +13,7 @@ extern int turn; // 1 if white, -1 if black
 extern int selectedPiece;
 Position selectedPiecePos;
 
+bool explode();
 void initialize();
 int absolute();
 bool sameSign();

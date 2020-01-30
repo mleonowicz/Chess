@@ -61,6 +61,24 @@ bool opposeSign(int n, int m) {
     return (n > 0 && m < 0) || (n < 0 && m > 0);
 }
 
+bool explode(Position tile) {
+    bool lost = false;
+
+    for (int x = tile.x - 1; x <= tile.x + 1; x++) {
+        for (int y = tile.y - 1; y <= tile.y + 1; y++) {
+            if (x >= 0 && y >= 0 && x <= 7 && y <= 7) {
+                if (absolute(pieces[x][y]) == 6)
+                    lost = true;
+                
+                pieces[x][y] = 0;
+                removePieceImage(x, y);
+            }
+        }
+    }
+
+    return lost;
+}
+
 bool isTileAttacked(Position tile, int t) { // t for enemy piece
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
@@ -111,12 +129,25 @@ void castle(Position k, Position r) {
     if (newRook.x == newKing.x)
         newKing.x += x;
 
+    placePiece(r, newRook);
     placePiece(k, newKing);
     changeKingPos(turn, newKing);
-    placePiece(r, newRook);
-    movedRook(newRook);
+    
+    if (!isTileAttacked(turn == 1 ? whiteKing : blackKing, turn * -1)) { // if castle would put king in a check
+        placePiece(k, newKing);
+        changeKingPos(turn, newKing);
+        kingMoved(turn); // changing kings first move
 
-    turn *= -1;
+        placePiece(r, newRook);
+        movedRook(newRook);
+
+        turn *= -1;
+    }
+    else {
+        placePiece(newRook, r);
+        placePiece(newKing, k);
+        changeKingPos(turn, k);
+    }
 }
 
 bool checkCastle(int newPiece, Position pos) {
@@ -149,14 +180,12 @@ bool checkCastle(int newPiece, Position pos) {
     if (!checkIfRookMoved(rookPos)) {
         if (turn == 1) {
             if (!whiteKingMoved) {
-                kingMoved(turn);
                 castle(kingPos, rookPos);
                 return true;
             }
         }
         else {
             if (!blackKingMoved) {
-                kingMoved(turn);
                 castle(kingPos, rookPos);
                 return true;
             }
@@ -246,8 +275,18 @@ void handleClick(Position pos) {
                 kingMoved(turn);
             else if (absolute(selectedPiece) == 4)
                 movedRook(selectedPiecePos);
-            
-            makeMove(selectedPiecePos, pos);
+
+            if (attacking(pos)) {
+                placePiece(selectedPiecePos, pos);
+                if (explode(pos))   {
+                    printf("lost\n");
+                    fflush(stdout);
+                }
+            }                
+            else 
+                placePiece(selectedPiecePos, pos);
+
+            turn *= -1;
         }
 
         printBoard();
@@ -261,12 +300,6 @@ void placePiece(Position from, Position to) {
 
     setStyleSelected(from.x, from.y, false);
     selectedPiece = 0;
-}
-
-void makeMove(Position from, Position to) {
-    placePiece(from, to);
-
-    turn *= -1;
 }
 
 void movePiece(Position from, Position to) {
