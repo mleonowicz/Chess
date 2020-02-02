@@ -52,7 +52,7 @@ void movedRook(Position from) {
     checkIfFirstMove(from);
 }
 
-bool legalMoveRook(Position from, Position to) {
+bool legalMoveRook(int array[8][8], Position from, Position to) {
     
     int offsetX = to.x - from.x;
     int offsetY = to.y - from.y;
@@ -82,7 +82,7 @@ bool legalMoveRook(Position from, Position to) {
     count--;
 
     while (count-- > 0) {
-        if (pieces[newX][newY] != 0)
+        if (array[newX][newY] != 0)
             return false;
 
         newX += x;

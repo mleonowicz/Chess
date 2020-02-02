@@ -1,7 +1,7 @@
 #include "bishop.h"
 #include <stdio.h>
 
-bool legalMoveBishop(Position from, Position to) {
+bool legalMoveBishop(int array[8][8], Position from, Position to) {
     int offsetX = to.x - from.x;
     int offsetY = to.y - from.y;
 
@@ -20,7 +20,7 @@ bool legalMoveBishop(Position from, Position to) {
     count--;
 
     while(count-- > 0) {
-        if (pieces[from.x][from.y] != 0)
+        if (array[from.x][from.y] != 0)
             return false;
         from.x += x;
         from.y += y;

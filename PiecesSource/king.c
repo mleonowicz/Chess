@@ -25,7 +25,10 @@ void changeKingPos(int t, Position to) { // t stands for turn, 1 - white, -1 bla
     }
 } 
 
-bool legalMoveKing(Position from, Position to) {
+bool legalMoveKing(Position from, Position to, bool attacking) {
+    if (attacking)
+        return false;
+
     int offsetX = from.x - to.x;
     int offsetY = from.y - to.y;
 

@@ -30,16 +30,28 @@ void initialize() {
     blackKing.y = 7;
 }
 
-void printBoard() {
+void printBoard(int array[8][8]) {
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 8; j++) {
-            if (pieces[j][i] < 0)
-                printf("%d ", pieces[j][i]);
+            if (array[j][i] < 0)
+                printf("%d ", array[j][i]);
             else 
-                printf("%d  ", pieces[j][i]);
+                printf("%d  ", array[j][i]);
         }
         putchar('\n');
     }
+
+    fflush(stdout);
+}
+
+bool isKingDead(int array[8][8], int t) { // 1 for white, -1 for black 
+    for (int i = 0; i < 8; i++) 
+        for (int j = 0; j < 8; j++) {
+            if (array[i][j] == 6 * t)
+                return false;
+        }
+    
+    return true;
 }
 
 int absolute(int i) {
@@ -61,17 +73,19 @@ bool opposeSign(int n, int m) {
     return (n > 0 && m < 0) || (n < 0 && m > 0);
 }
 
-bool explode(Position tile) {
+bool explode(int array[8][8], Position tile) {
     bool lost = false;
 
     for (int x = tile.x - 1; x <= tile.x + 1; x++) {
         for (int y = tile.y - 1; y <= tile.y + 1; y++) {
             if (x >= 0 && y >= 0 && x <= 7 && y <= 7) {
-                if (absolute(pieces[x][y]) == 6)
+                if (absolute(array[x][y]) == 6)
                     lost = true;
                 
-                pieces[x][y] = 0;
-                removePieceImage(x, y);
+                array[x][y] = 0;
+
+                if (array == pieces)
+                    removePieceImage(x, y);
             }
         }
     }
@@ -79,21 +93,21 @@ bool explode(Position tile) {
     return lost;
 }
 
-bool isTileAttacked(Position tile, int t) { // t for enemy piece
+bool isTileAttacked(int array[8][8], Position tile, int t) { // t for enemy piece
     for (int x = 0; x < 8; x++) {
         for (int y = 0; y < 8; y++) {
-            if (sameSign(pieces[x][y], t)) {
+            if (sameSign(array[x][y], t)) {
                 Position pos;
                 pos.x = x;
                 pos.y = y;
 
-                switch (pieces[x][y] * t) {
+                switch (array[x][y] * t) {
                     case 1:
                         if (legalMovePawn(pos, tile, true, t))
                             return true;
                     break;
                     case 2:
-                        if (legalMoveBishop(pos, tile))
+                        if (legalMoveBishop(array, pos, tile))
                             return true;
                     break;
                     case 3:
@@ -101,11 +115,11 @@ bool isTileAttacked(Position tile, int t) { // t for enemy piece
                             return true;
                     break;
                     case 4:
-                        if (legalMoveRook(pos, tile))
+                        if (legalMoveRook(array, pos, tile))
                             return true;
                     break;
                     case 5:
-                        if (legalMoveBishop(pos, tile) || legalMoveRook(pos, tile))
+                        if (legalMoveBishop(array, pos, tile) || legalMoveRook(array, pos, tile))
                             return true;
                     break;
                 }
@@ -133,7 +147,7 @@ void castle(Position k, Position r) {
     placePiece(k, newKing);
     changeKingPos(turn, newKing);
     
-    if (!isTileAttacked(turn == 1 ? whiteKing : blackKing, turn * -1)) { // if castle would put king in a check
+    if (!isTileAttacked(pieces, turn == 1 ? whiteKing : blackKing, turn * -1)) { // if castle would put king in a check
         placePiece(k, newKing);
         changeKingPos(turn, newKing);
         kingMoved(turn); // changing kings first move
@@ -218,7 +232,7 @@ void handleClick(Position pos) {
                     correctMove = true;
             break;
             case 2:
-                if (legalMoveBishop(selectedPiecePos, pos))
+                if (legalMoveBishop(pieces, selectedPiecePos, pos))
                     correctMove = true;               
             break;
             case 3:
@@ -226,70 +240,83 @@ void handleClick(Position pos) {
                     correctMove = true;
             break;
             case 4:
-                if (legalMoveRook(selectedPiecePos, pos)) {
+                if (legalMoveRook(pieces, selectedPiecePos, pos)) {
                     // movedRook(selectedPiecePos);
                     correctMove = true;
                 }
             break;
             case 5: 
-                if (legalMoveRook(selectedPiecePos, pos) || legalMoveBishop(selectedPiecePos, pos)) // queen movement is same as rook and bishop
+                if (legalMoveRook(pieces, selectedPiecePos, pos) || legalMoveBishop(pieces, selectedPiecePos, pos)) // queen movement is same as rook and bishop
                     correctMove = true;
             break;
             case 6:
-                if (legalMoveKing(selectedPiecePos, pos)) {
+                if (legalMoveKing(selectedPiecePos, pos, attacking(pos))) {
                     // movedKing(turn, pos);
                     correctMove = true;
                 }
             break;
         }
 
-        if (correctMove) { // checkin if move would put king in a check
-            bool illegalMove = false;
+        if (!correctMove)
+            return;
 
-            int tempPiece = pieces[pos.x][pos.y];
-            movePiece(selectedPiecePos, pos);
-
-            if (absolute(selectedPiece) == 6)
-                changeKingPos(turn, pos);   
-
-            if (turn == 1) {
-                if (isTileAttacked(whiteKing, -1))
-                    illegalMove = true;
-            }
-            else {
-                if (isTileAttacked(blackKing, 1))
-                    illegalMove = true;
-            }
-
-            movePiece(pos, selectedPiecePos);
-            pieces[pos.x][pos.y] = tempPiece;
-
-            if (illegalMove) {
-                if (absolute(selectedPiece) == 6)
-                    changeKingPos(turn, selectedPiecePos);
-
-                return;
-            }
-
-            if (absolute(selectedPiece) == 6)
-                kingMoved(turn);
-            else if (absolute(selectedPiece) == 4)
-                movedRook(selectedPiecePos);
-
-            if (attacking(pos)) {
-                placePiece(selectedPiecePos, pos);
-                if (explode(pos))   {
-                    printf("lost\n");
-                    fflush(stdout);
-                }
-            }                
-            else 
-                placePiece(selectedPiecePos, pos);
-
-            turn *= -1;
+        int array[8][8];
+        memcpy(array, pieces, sizeof(pieces));
+        
+        if (attacking(pos)) {
+            explode(array, pos);
+            array[selectedPiecePos.x][selectedPiecePos.y] = 0;
         }
 
-        printBoard();
+        if (isKingDead(array, turn * -1) && !isKingDead(array, turn)) { // checking if can kill king in one turn under check
+                placePiece(selectedPiecePos, pos);
+                explode(pieces, pos);
+                
+                printf("lost\n");
+                fflush(stdout);
+                return;
+        }
+
+        // checkin if move would put king in a check
+        bool illegalMove = false;
+
+        array[pos.x][pos.y] = array[selectedPiecePos.x][selectedPiecePos.y];
+
+        if (absolute(selectedPiece) == 6)
+            changeKingPos(turn, pos);   
+
+        if (turn == 1) {
+            if (isTileAttacked(array, whiteKing, -1))
+                illegalMove = true;
+        }
+        else {
+            if (isTileAttacked(array, blackKing, 1))
+                illegalMove = true;
+        }
+
+        if (illegalMove) {
+            if (absolute(selectedPiece) == 6)
+                changeKingPos(turn, selectedPiecePos);
+
+            return;
+        }
+
+        if (absolute(selectedPiece) == 6) // making move
+            kingMoved(turn);
+        else if (absolute(selectedPiece) == 4)
+            movedRook(selectedPiecePos);
+
+        if (attacking(pos)) {
+            placePiece(selectedPiecePos, pos);
+            if (explode(pieces, pos))   {
+                printf("lost\n");
+                fflush(stdout);
+            }
+        }                
+        else 
+            placePiece(selectedPiecePos, pos);
+
+        turn *= -1;
     }
 }
 
