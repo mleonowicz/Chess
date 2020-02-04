@@ -1,5 +1,4 @@
 #include "bishop.h"
-#include <stdio.h>
 
 bool legalMoveBishop(int array[8][8], Position from, Position to) {
     int offsetX = to.x - from.x;

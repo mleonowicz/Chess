@@ -10,6 +10,7 @@ void placePieceImage(int, int, int);
 void removePieceImage(int, int);
 void button_clicked(GtkWidget *, gpointer);
 void setStyleSelected(int, int, bool);
+void setStyleCanMove(int, int, bool);
 void initPieces();
 void initBoard();
 int main(int, char **);

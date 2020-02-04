@@ -1,5 +1,4 @@
 #include "knight.h"
-#include <stdio.h>
 
 bool legalMoveKnight(Position from, Position to) {
 

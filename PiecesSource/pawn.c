@@ -1,7 +1,6 @@
 #include "pawn.h"
-#include <stdio.h>
 
-bool legalMovePawn(Position from, Position to, bool attacking, int color) { // 1 for white, -1 for black
+bool legalMovePawn(Position from, Position to, bool attacking, int color, int array[8][8]) { // 1 for white, -1 for black
     bool firstMove = false;
 
     if (from.x == to.x && !attacking) { // moving forward
@@ -11,14 +10,14 @@ bool legalMovePawn(Position from, Position to, bool attacking, int color) { // 1
             if (from.y == 1)
                 firstMove = true;
 
-            return (offset == -1 || (firstMove && offset == -2));
+            return (offset == -1 || (firstMove && offset == -2 && array[from.x][to.y - 1] == 0));
                 
         }
         else {
             if (from.y == 6)
                 firstMove = true;
 
-            return (offset == 1 || (firstMove && offset == 2));
+            return (offset == 1 || (firstMove && offset == 2 && array[from.x][to.y + 1] == 0));
         }
     }
     

@@ -136,8 +136,8 @@ void initBoard() {
 
 int main(int argc, char **argv) {
     gtk_init(&argc, &argv);
-
     loadCSS();
+
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_resizable((GtkWindow *)window, FALSE);
     

@@ -1,5 +1,4 @@
 #include "rook.h"
-#include <stdio.h>
 
 bool rookMoved[2][2] = { 
         {false, false},
@@ -13,7 +12,7 @@ bool rookMoved[2][2] = {
 */
 
 bool *mapRook(Position from) {
-    bool *b = NULL;
+    bool *b;
 
     if (from.x == 0) {
         if (from.y == 0)
