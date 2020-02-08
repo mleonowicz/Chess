@@ -248,6 +248,9 @@ bool canCastle(int pieceFrom, int pieceTo, Position from, Position to, int t) {
     else if (blackKingMoved)
         return false;
 
+    if (isTileAttacked(pieces, kingPos, t * -1))
+        return false;
+
     int x = (kingPos.x - rookPos.x) > 0 ? -1 : 1;
     int y = kingPos.y;
 
@@ -260,7 +263,6 @@ bool canCastle(int pieceFrom, int pieceTo, Position from, Position to, int t) {
         newX += x;
     }
 
-    
     Position newKing;
     Position newRook;
 
@@ -305,7 +307,6 @@ bool checkIfCheckMate(int array[8][8], int t) {
             piecePos.y = j;
             int piece = array[i][j];
 
-
             if (sameSign(piece, t)) {
                 for (int x = 0; x < 8; x++)
                     for (int y = 0; y < 8; y++) {
@@ -319,14 +320,13 @@ bool checkIfCheckMate(int array[8][8], int t) {
                                 int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, false);
 
                                 if (k == 1) {
-                                    printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
-
-                                    fflush(stdout);
+                                    // printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
+                                    // fflush(stdout);
                                     return false;
                                 }
                                 else if (k == -1 && !moveWouldPutInCheck(pieces, piecePos, newPos, absolute(piece), t)) {
-                                    printf("Not in check from X:%d Y:%d, To X:%d Y:%d\n",i, j, x, y);
-                                    fflush(stdout);
+                                    // printf("Not in check from X:%d Y:%d, To X:%d Y:%d\n",i, j, x, y);
+                                    // fflush(stdout);
                                     return false;
                                 }
                             }
@@ -335,9 +335,8 @@ bool checkIfCheckMate(int array[8][8], int t) {
                     }
             }
         }
-
-    printf("In check\n");
-    fflush(stdout);
+    // printf("In check\n");
+    // fflush(stdout);
     return true;
 }
 
@@ -361,7 +360,7 @@ void drawMoves(Position pos) {
                             setStyleSelected(x, y, true);
                     }
                 }
-                else if (canCastle(piece, pieceTemp, pos, newPos, turn) && !isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn))
+                else if (canCastle(piece, pieceTemp, pos, newPos, turn))
                     setStyleSelected(x, y, true);  
             }
 }
@@ -372,7 +371,7 @@ void handleClick(Position pos) {
     if (sameSign(piece, turn)) {
         removeStyle();
 
-        if (canCastle(selectedPiece, piece, selectedPiecePos, pos, turn) && !isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn)) {
+        if (canCastle(selectedPiece, piece, selectedPiecePos, pos, turn)) {
             castle(selectedPiecePos, pos);
             return;
         }

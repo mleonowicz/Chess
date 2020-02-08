@@ -1,5 +1,5 @@
 #include "king.h"
-
+    
 bool whiteKingMoved = false;
 bool blackKingMoved = false;
 
