@@ -260,6 +260,7 @@ bool canCastle(int pieceFrom, int pieceTo, Position from, Position to, int t) {
         newX += x;
     }
 
+    
     Position newKing;
     Position newRook;
 
@@ -315,20 +316,18 @@ bool checkIfCheckMate(int array[8][8], int t) {
 
                         if (!sameSign(pieceTemp, t)) {
                             if (legalMove(piecePos, newPos, absolute(piece), attacking(newPos), t, pieces)) {
-                                if (!moveWouldPutInCheck(pieces, piecePos, newPos, absolute(piece), t)) {
-                                    printf("Not in check from X:%d Y:%d, To X:%d Y:%d\n",i, j, x, y);
+                                int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, false);
+
+                                if (k == 1) {
+                                    printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
+
                                     fflush(stdout);
                                     return false;
                                 }
-                                else {
-                                    int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, false);
-
-                                    if (k == 1) {
-                                        printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
-
-                                        fflush(stdout);
-                                        return false;
-                                    }
+                                else if (k == -1 && !moveWouldPutInCheck(pieces, piecePos, newPos, absolute(piece), t)) {
+                                    printf("Not in check from X:%d Y:%d, To X:%d Y:%d\n",i, j, x, y);
+                                    fflush(stdout);
+                                    return false;
                                 }
                             }
                         }
@@ -354,17 +353,15 @@ void drawMoves(Position pos) {
 
                 if (!sameSign(pieceTemp, turn)) {
                     if (legalMove(pos, newPos, absolute(piece), attacking(newPos), turn, pieces)) {
-                        if (!moveWouldPutInCheck(pieces, pos, newPos, absolute(piece), turn)) 
-                            setStyleSelected(x, y, true);  
-                        else {
-                            int i = moveWouldKillKing(pieces, selectedPiece, pos, newPos, turn, false);
+                        int i = moveWouldKillKing(pieces, selectedPiece, pos, newPos, turn, false);
 
-                            if (i == 1)
-                                setStyleSelected(x, y, true);  
-                        }
+                        if (i == 1)
+                            setStyleSelected(x, y, true);  
+                        else if (i == -1 && !moveWouldPutInCheck(pieces, pos, newPos, absolute(piece), turn)) 
+                            setStyleSelected(x, y, true);
                     }
                 }
-                else if (isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn) && canCastle(piece, pieceTemp, pos, newPos, turn))
+                else if (canCastle(piece, pieceTemp, pos, newPos, turn) && !isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn))
                     setStyleSelected(x, y, true);  
             }
 }
@@ -375,9 +372,8 @@ void handleClick(Position pos) {
     if (sameSign(piece, turn)) {
         removeStyle();
 
-        if (canCastle(selectedPiece, piece, selectedPiecePos, pos, turn) && isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn) ) {
+        if (canCastle(selectedPiece, piece, selectedPiecePos, pos, turn) && !isTileAttacked(pieces, turn == 1 ? blackKing : whiteKing, turn)) {
             castle(selectedPiecePos, pos);
-            printBoard(pieces);
             return;
         }
 
@@ -436,11 +432,11 @@ void handleClick(Position pos) {
         
         removeStyle();
 
-        printBoard(pieces);
-        printf("Selected %d X:%d Y:%d\n", selectedPiece, selectedPiecePos.x, selectedPiecePos.y);
-        printf("WHITE: X:%d Y:%d\n", whiteKing.x, whiteKing.y);
-        printf("BLACK: X:%d Y:%d\n", blackKing.x, blackKing.y);
-        printf("TURN: %d\n", turn);
+        // printBoard(pieces);
+        // printf("Selected %d X:%d Y:%d\n", selectedPiece, selectedPiecePos.x, selectedPiecePos.y);
+        // printf("WHITE: X:%d Y:%d\n", whiteKing.x, whiteKing.y); 
+        // printf("BLACK: X:%d Y:%d\n", blackKing.x, blackKing.y);
+        // printf("TURN: %d\n", turn);
 
         checkIfCheckMate(pieces, turn);
     }
