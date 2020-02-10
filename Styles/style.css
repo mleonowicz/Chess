@@ -21,3 +21,30 @@ button {
 #blackSelected {
     background-color: rgb(96, 158, 132);
 }
+
+#menuLayout {
+    background-color: rgb(96, 158, 132);
+}
+
+#menu {
+    background-color: rgb(109, 154, 184);
+    border: 5px solid black;
+    margin: 5px;
+}
+
+#newGame {
+    color: black;
+    font-size: 200%;
+}
+
+#title {
+    font-weight: bold;
+    color: black;
+    font-size: 400%;
+}
+
+#infoWhite {
+    font-weight: bold;
+    color: white;
+    font-size: 400%;
+}

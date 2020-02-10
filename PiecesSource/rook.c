@@ -11,6 +11,12 @@ bool rookMoved[2][2] = {
     1,1 - right black
 */
 
+void resetRooks() {
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2; j++)
+            rookMoved[i][j] = false;
+}
+
 bool *mapRook(Position from) {
     bool *b;
 

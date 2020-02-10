@@ -7,6 +7,17 @@
 #include "PiecesSource/rook.h"
 #include "PiecesSource/king.h"
 
+int piecesSample[8][8] = { 
+                {4, 1, 0, 0, 0, 0, -1, -4}, 
+                {3, 1, 0, 0, 0, 0, -1, -3},
+                {2, 1, 0, 0, 0, 0, -1, -2},
+                {5, 1, 0, 0, 0, 0, -1, -5},
+                {6, 1, 0, 0, 0, 0, -1, -6},
+                {2, 1, 0, 0, 0, 0, -1, -2},
+                {3, 1, 0, 0, 0, 0, -1, -3}, 
+                {4, 1, 0, 0, 0, 0, -1, -4} 
+                };
+
 int pieces[8][8] = { 
                 {4, 1, 0, 0, 0, 0, -1, -4}, 
                 {3, 1, 0, 0, 0, 0, -1, -3},
@@ -18,16 +29,29 @@ int pieces[8][8] = {
                 {4, 1, 0, 0, 0, 0, -1, -4} 
                 };
 
+bool check = false;
 int turn = 1;
 int selectedPiece = 0;
 Position selectedPiecePos;
 
 void initialize() {
+    turn = 1;
+    selectedPiece = 0;
+
     whiteKing.x = 4;
     whiteKing.y = 0;
 
     blackKing.x = 4;
     blackKing.y = 7;
+
+    whiteKingMoved = false;
+    blackKingMoved = false;
+
+    resetRooks();
+
+    for (int x = 0; x < 8; x++)
+        for (int y = 0; y < 8; y++)
+            pieces[x][y] = piecesSample[x][y];
 }
 
 void printBoard(int array[8][8]) {
@@ -171,8 +195,14 @@ bool moveWouldPutInCheck(int array[8][8], Position from, Position to, int piece,
 
     memcpy(arrayCopy, array, sizeof(pieces));
 
-    arrayCopy[to.x][to.y] = arrayCopy[from.x][from.y];
-    arrayCopy[from.x][from.y] = 0;
+    if (attacking(to)) {
+        explode(arrayCopy, to);
+        arrayCopy[from.x][from.y] = 0;
+    } 
+    else {
+        arrayCopy[to.x][to.y] = arrayCopy[from.x][from.y];
+        arrayCopy[from.x][from.y] = 0;
+    }
         
     if (absolute(piece) == 6)
         changeKingPos(t, to);   
@@ -185,9 +215,9 @@ bool moveWouldPutInCheck(int array[8][8], Position from, Position to, int piece,
         if (isTileAttacked(arrayCopy, blackKing, 1))
             illegalMove = true;
     }
-
+    
     if (absolute(piece) == 6)
-        changeKingPos(t, selectedPiecePos);
+        changeKingPos(t, from);
 
     return illegalMove;
 }
@@ -314,10 +344,11 @@ bool checkIfCheckMate(int array[8][8], int t) {
                         newPos.x = x;
                         newPos.y = y;
                         int pieceTemp = pieces[x][y];
+                        bool pawnMove = absolute(piece) == 1 ? true : false;
 
                         if (!sameSign(pieceTemp, t)) {
                             if (legalMove(piecePos, newPos, absolute(piece), attacking(newPos), t, pieces)) {
-                                int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, false);
+                                int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, pawnMove);
 
                                 if (k == 1) {
                                     // printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
@@ -335,8 +366,8 @@ bool checkIfCheckMate(int array[8][8], int t) {
                     }
             }
         }
-    // printf("In check\n");
-    // fflush(stdout);
+    check = true;
+    changeLabel("Checkmate");
     return true;
 }
 
@@ -350,9 +381,10 @@ void drawMoves(Position pos) {
                 newPos.y = y;
                 int pieceTemp = pieces[x][y];
 
+                bool pawnMove = absolute(piece) == 1 ? true : false;
                 if (!sameSign(pieceTemp, turn)) {
                     if (legalMove(pos, newPos, absolute(piece), attacking(newPos), turn, pieces)) {
-                        int i = moveWouldKillKing(pieces, selectedPiece, pos, newPos, turn, false);
+                        int i = moveWouldKillKing(pieces, selectedPiece, pos, newPos, turn, pawnMove);
 
                         if (i == 1)
                             setStyleSelected(x, y, true);  
@@ -366,6 +398,9 @@ void drawMoves(Position pos) {
 }
 
 void handleClick(Position pos) {
+    if (check)
+        return;
+
     int piece = pieces[pos.x][pos.y];
 
     if (sameSign(piece, turn)) {
@@ -385,9 +420,8 @@ void handleClick(Position pos) {
     }
     else if (selectedPiece != 0) {
         
-
         bool correctMove = legalMove(selectedPiecePos, pos, absolute(selectedPiece), attacking(pos), turn, pieces);
-        bool pawnMove = false;
+        bool pawnMove = absolute(selectedPiece) == 1 ? true : false;
 
         if (!correctMove)
             return;

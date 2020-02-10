@@ -7,5 +7,6 @@
 void movedRook(Position);
 bool legalMoveRook(int[8][8], Position, Position);
 bool checkIfRookMoved(Position);
+void resetRooks();
 
 #endif

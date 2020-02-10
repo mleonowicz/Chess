@@ -3,14 +3,14 @@
 
 Position cords[8][8];
 GtkButton *squares[8][8];
-GtkWidget *window, *chessboard, *button;
+GtkWidget *window, *chessboard, *button, *menuLayout, *label, *labelInfo;
 
 void loadCSS() {
     GtkCssProvider *provider = gtk_css_provider_new();
     GdkDisplay *display = gdk_display_get_default();
     GdkScreen *screen = gdk_display_get_default_screen(display);
 
-    const gchar *style = "Styles/style.css";
+    gchar *style = "Styles/style.css";
     GError *error = 0;
     GFile *css = g_file_new_for_path(style);
 
@@ -111,6 +111,33 @@ void setStyleSelected(int x, int y, bool selected) {
     }
 } 
 
+void resetGame(GtkWidget *widget, gpointer data) {
+    gtk_container_remove(GTK_CONTAINER (window), chessboard);
+
+    initialize();
+    initBoard();
+    initPieces();
+
+    gtk_container_add(GTK_CONTAINER(window), chessboard);
+    gtk_widget_show_all(window);
+}
+
+void newGame(GtkWidget *widget, gpointer data) {
+    gtk_container_remove(GTK_CONTAINER (window), menuLayout);
+    gtk_window_resize(GTK_WINDOW(window), 800, 900);
+
+    initialize();
+    initBoard();
+    initPieces();
+
+    gtk_container_add(GTK_CONTAINER(window), chessboard);
+    gtk_widget_show_all(window);
+}
+
+void changeLabel(gchar *g) {
+    gtk_label_set_text((GtkLabel *)labelInfo, g);
+}
+
 void initBoard() {
     chessboard = gtk_grid_new();
     
@@ -127,11 +154,98 @@ void initBoard() {
             cords[x][y].x = x;
             cords[x][y].y = y;
 
-            g_signal_connect(button, "clicked", G_CALLBACK(button_clicked), &cords[x][y]);
+            g_signal_connect(button, "clicked", 
+                            G_CALLBACK(button_clicked), &cords[x][y]);
 
             squares[x][y] = (GtkButton *)button;
             gtk_grid_attach((GtkGrid *)chessboard, button, x, y, 1, 1);
         }
+
+    //exit button
+    button = gtk_button_new();
+    gtk_widget_set_size_request(button, 190, 100);
+    g_signal_connect(button, "clicked",
+		      G_CALLBACK(createMenu), NULL);
+
+    label = gtk_label_new("Exit");
+
+    gtk_widget_set_name(label, "newGame");
+    gtk_widget_set_name(button, "menu");
+
+    gtk_container_add(GTK_CONTAINER (button), label);
+    gtk_grid_attach((GtkGrid *)chessboard, button, 0, 8, 2, 1);
+
+    //reset button
+    button = gtk_button_new();
+    gtk_widget_set_size_request(button, 190, 100);
+    g_signal_connect(button, "clicked",
+		      G_CALLBACK(resetGame), NULL);
+
+    label = gtk_label_new("Reset");
+
+    gtk_widget_set_name(label, "newGame");
+    gtk_widget_set_name(button, "menu");
+
+    gtk_container_add(GTK_CONTAINER (button), label);
+    gtk_grid_attach((GtkGrid *)chessboard, button, 2, 8, 2, 1);
+
+    //adding label
+    labelInfo = gtk_label_new("WHITE");
+    gtk_widget_set_size_request(labelInfo, 400, 100);
+    gtk_widget_set_name(labelInfo, "infoWhite");
+
+    gtk_grid_attach((GtkGrid *)chessboard, labelInfo, 4, 8, 4, 1);
+}
+
+void close_window(GtkWidget *widget, gpointer w) {
+    gtk_window_close((GtkWindow *)window);
+}
+
+void createMenu() {
+    if (gtk_container_get_children(GTK_CONTAINER(window)) != NULL)
+        gtk_container_remove(GTK_CONTAINER(window), chessboard);
+        
+    gtk_window_resize(GTK_WINDOW(window), 500, 300);
+    
+    menuLayout = gtk_grid_new();
+    gtk_widget_set_name(menuLayout, "menuLayout");
+
+    //title
+    label = gtk_label_new("Atomic Chess");
+    gtk_widget_set_name(label, "title");
+    gtk_widget_set_size_request(label, 500, 100);
+    gtk_grid_attach((GtkGrid *)menuLayout, label, 0, 0, 1, 1);
+
+    //exit button
+    button = gtk_button_new();
+    gtk_widget_set_size_request(button, 490, 100);
+    g_signal_connect(button, "clicked",
+		      G_CALLBACK(close_window), NULL);
+
+    label = gtk_label_new("Exit");
+
+    gtk_widget_set_name(label, "newGame");
+    gtk_widget_set_name(button, "menu");
+
+    gtk_container_add(GTK_CONTAINER (button), label);
+    gtk_grid_attach((GtkGrid *)menuLayout, button, 0, 2, 1, 1);
+
+    //new game button
+    button = gtk_button_new();
+    gtk_widget_set_size_request(button, 490, 100);
+    g_signal_connect(button, "clicked",
+		      G_CALLBACK (newGame), NULL);
+
+    label = gtk_label_new("New Game");
+
+    gtk_widget_set_name(label, "newGame");
+    gtk_widget_set_name(button, "menu");
+
+    gtk_container_add(GTK_CONTAINER (button), label);
+    gtk_grid_attach((GtkGrid *)menuLayout, button, 0, 1, 1, 1);
+
+    gtk_container_add(GTK_CONTAINER(window), menuLayout);
+    gtk_widget_show_all(window);
 }
 
 int main(int argc, char **argv) {
@@ -139,15 +253,18 @@ int main(int argc, char **argv) {
     loadCSS();
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_default_size(GTK_WINDOW(window), 500, 300);
+
+    gtk_window_set_title((GtkWindow *)window, "Atomic chess");
     gtk_window_set_resizable((GtkWindow *)window, FALSE);
     
-    initBoard();
-    initPieces();
+    g_signal_connect (window, "destroy",
+	                G_CALLBACK (gtk_main_quit), NULL);
 
-    gtk_container_add(GTK_CONTAINER(window), chessboard);
-    gtk_widget_show_all(window);
+    g_signal_connect (window, "delete-event",
+	 	            G_CALLBACK (gtk_main_quit), NULL);
 
-    initialize();
+    createMenu();
     gtk_main();
     
     return 0;
