@@ -102,7 +102,7 @@ void setStyleCheck(int x, int y, bool check) {
         }
     }
     else {
-        if (check % 2 == 1) 
+        if (offset % 2 == 1) 
             gtk_widget_set_name(button, "white");
         else {
             gtk_widget_set_name(button, "black");
