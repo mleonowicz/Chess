@@ -140,9 +140,7 @@ int moveWouldKillKing(int array[8][8], int piece, Position from, Position to, in
 
     if (isKingDead(arrayCopy, t * -1) && !isKingDead(arrayCopy, t))
         return 1;
-    else if (isKingDead(arrayCopy, t)) {
-        // printf("you cant kill your own king\n");
-        // fflush(stdout);
+    else if (isKingDead(arrayCopy, t)) { // if move would kill your own king
         return 0;
     }
 
@@ -354,13 +352,9 @@ bool checkIfCheckMate(int array[8][8], int t) {
                                 int k = moveWouldKillKing(pieces, selectedPiece, piecePos, newPos, t, pawnMove);
 
                                 if (k == 1) {
-                                    // printf("Not in check from X:%d Y:%d, To X:%d Y:%d, attacking\n",i, j, x, y);
-                                    // fflush(stdout);
                                     return false;
                                 }
                                 else if (k == -1 && !moveWouldPutInCheck(pieces, piecePos, newPos, absolute(piece), t)) {
-                                    // printf("Not in check from X:%d Y:%d, To X:%d Y:%d\n",i, j, x, y);
-                                    // fflush(stdout);
                                     return false;
                                 }
                             }
@@ -372,8 +366,6 @@ bool checkIfCheckMate(int array[8][8], int t) {
         
     check = true;
     changeLabel("Checkmate");
-    // Position pos = t == 1 ? whiteKing : blackKing;
-    // setStyleCheck(pos.x, pos.y, true);
 
     return true;
 }
@@ -493,13 +485,6 @@ void handleClick(Position pos) {
         turn *= -1;
         
         removeStyle();
-
-        // printBoard(pieces);
-        // printf("Selected %d X:%d Y:%d\n", selectedPiece, selectedPiecePos.x, selectedPiecePos.y);
-        // printf("WHITE: X:%d Y:%d\n", whiteKing.x, whiteKing.y); 
-        // printf("BLACK: X:%d Y:%d\n", blackKing.x, blackKing.y);
-        // printf("TURN: %d\n", turn);
-
         drawCheck();
         checkIfCheckMate(pieces, turn);
     }

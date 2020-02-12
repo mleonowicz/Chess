@@ -1,0 +1,38 @@
+OPIS MODUŁÓW
+
+1. uiManager.c
+W tym module zawarte są zmienne dotyczące layoutu, przycisków oraz całego gui. Są również funkcje służące do 
+-tworzenia menu
+-tworzenia gry
+-zmiany graficznej szaty na szachownicy
+-wczytywanie obrazków .svg z plików
+-znajduje się tu główny main() programu gtk
+
+2. gameManager.c
+Moduł ten zawiera całą logikę atomic chess z wyłączeniem poszczególnych pionów. Są w nim takie funkcje jak
+-obsługa inputu gracza oraz ruchy za pomocą uiManager
+-szukanie możliwych ruchów i ich wyświetlanie za pomocą uiManager
+-wszelkie zasady dotyczące szachów, które zawarte są w README.mc
+
+3. Każdy pionek (poza hetmanem, którego ruch jest identyczny jak wieży i gońca) ma własny moduł, w którym sprawdzany jest tylko
+możliwośc przesunięcia pionka z punktu A do B.
+
+Dodatkowo w module king.c zawarta jest informacja o tym, czy dany król się ruszył, by móc sprawdzać czy roszada jest możliwa do wykonania.
+W module rook.c jest tablica, która zawiera informacje o tym, która wieża się ruszyła, lub której nie ma już w grze.
+
+OPIS STRUKTUR DANYCH
+
+Do rozmieszczenia graficznego szachownicy i pionków użyłem zwyczajnej dwuwymiarowej tablicy buttonów rozmieszczonych w gridzie (GTK). Jeżeli w danym miejscu
+stoi pionek, to ustawiam image buttona, jeśli nie, button nie ma image.
+
+Do trzymania informacji o szachownicy używam dwuwymiarowej tablicy 8x8 i takiej notacji:
+
+0 - puste pole
+1 - pawn
+2 - bishop
+3 - knight
+4 - rook
+5 - queen
+6 - king
+
+Gdzie liczba dodatnia to biały pionek, a ujemna to czarny pionek.
