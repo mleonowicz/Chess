@@ -5,10 +5,10 @@ bool rookMoved[2][2] = {
         {false, false} 
         };
 /*
-    0,0 - left white
-    0,1 - right white
-    1,0 - left black
-    1,1 - right black
+    0,0 - left white A1
+    0,1 - right white H1
+    1,0 - left black A7
+    1,1 - right black H7
 */
 
 void resetRooks() {
@@ -34,6 +34,17 @@ bool *mapRook(Position from) {
     }
 
     return b;
+}
+
+void checkIfRookRemoved(Position pos) {
+    if ((pos.x != 0 || (pos.y != 0 && pos.y != 7)) 
+    && (pos.x != 7 || (pos.y != 0 && pos.y != 7))) 
+        return;
+
+    if (absolute(pieces[pos.x][pos.y]) != 4) {
+        bool *b = mapRook(pos);
+        *b = true;
+    }
 }
 
 void checkIfFirstMove(Position from) {

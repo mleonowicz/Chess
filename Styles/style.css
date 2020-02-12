@@ -48,3 +48,11 @@ button {
     color: white;
     font-size: 400%;
 }
+
+#whiteCheck {
+    background-color: rgb(204, 49, 49);
+}
+
+#blackCheck {
+    background-color: rgb(133, 27, 27);
+}

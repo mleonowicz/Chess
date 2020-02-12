@@ -12,6 +12,7 @@ void button_clicked(GtkWidget *, gpointer);
 void setStyleSelected(int, int, bool);
 void setStyleCanMove(int, int, bool);
 void initPieces();
+void setStyleCheck(int, int, bool);
 void createMenu();
 void changeLabel(gchar *);
 void initBoard();

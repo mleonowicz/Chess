@@ -90,20 +90,39 @@ void initPieces() {
         }
 } 
 
+void setStyleCheck(int x, int y, bool check) {
+    GtkWidget *button = (GtkWidget *)squares[x][y];
+    int offset = absolute(x - y);
+
+    if (check) {
+        if (offset % 2 == 1) 
+            gtk_widget_set_name(button, "whiteCheck");
+        else {
+            gtk_widget_set_name(button, "blackCheck");
+        }
+    }
+    else {
+        if (check % 2 == 1) 
+            gtk_widget_set_name(button, "white");
+        else {
+            gtk_widget_set_name(button, "black");
+        }
+    }
+}
+
 void setStyleSelected(int x, int y, bool selected) {
     GtkWidget *button = (GtkWidget *)squares[x][y];
-
-    const gchar *name = gtk_widget_get_name(button);
+    int offset = absolute(x - y);
 
     if (selected) {
-        if (name[0] == 'w') 
+        if (offset % 2 == 1) 
             gtk_widget_set_name(button, "whiteSelected");
         else {
             gtk_widget_set_name(button, "blackSelected");
         }
     }
     else {
-        if (name[0] == 'w') 
+        if (offset % 2 == 1) 
             gtk_widget_set_name(button, "white");
         else {
             gtk_widget_set_name(button, "black");
@@ -117,6 +136,7 @@ void resetGame(GtkWidget *widget, gpointer data) {
     initialize();
     initBoard();
     initPieces();
+    changeLabel("");
 
     gtk_container_add(GTK_CONTAINER(window), chessboard);
     gtk_widget_show_all(window);
@@ -129,6 +149,7 @@ void newGame(GtkWidget *widget, gpointer data) {
     initialize();
     initBoard();
     initPieces();
+    changeLabel("");
 
     gtk_container_add(GTK_CONTAINER(window), chessboard);
     gtk_widget_show_all(window);

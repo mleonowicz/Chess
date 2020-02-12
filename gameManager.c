@@ -35,6 +35,7 @@ int selectedPiece = 0;
 Position selectedPiecePos;
 
 void initialize() {
+    check = false;
     turn = 1;
     selectedPiece = 0;
 
@@ -106,7 +107,7 @@ bool explode(int array[8][8], Position tile) {
                 if (absolute(array[x][y]) == 6)
                     lost = true;
                 
-                if (absolute(array[x][y]) != 1) {
+                if (absolute(array[x][y]) != 1 && array[x][y] != 0) {
                     array[x][y] = 0;
 
                     if (array == pieces)
@@ -140,8 +141,8 @@ int moveWouldKillKing(int array[8][8], int piece, Position from, Position to, in
     if (isKingDead(arrayCopy, t * -1) && !isKingDead(arrayCopy, t))
         return 1;
     else if (isKingDead(arrayCopy, t)) {
-        printf("you cant kill your own king\n");
-        fflush(stdout);
+        // printf("you cant kill your own king\n");
+        // fflush(stdout);
         return 0;
     }
 
@@ -324,6 +325,8 @@ bool canCastle(int pieceFrom, int pieceTo, Position from, Position to, int t) {
 }
 
 void removeStyle() {
+    changeLabel("");
+
     for (int x = 0; x < 8; x++)
         for (int y = 0; y < 8; y++) 
             setStyleSelected(x, y, false);
@@ -366,8 +369,12 @@ bool checkIfCheckMate(int array[8][8], int t) {
                     }
             }
         }
+        
     check = true;
     changeLabel("Checkmate");
+    // Position pos = t == 1 ? whiteKing : blackKing;
+    // setStyleCheck(pos.x, pos.y, true);
+
     return true;
 }
 
@@ -397,6 +404,17 @@ void drawMoves(Position pos) {
             }
 }
 
+void drawCheck() {
+    if (isTileAttacked(pieces, whiteKing, -1)) {
+        changeLabel("Check");
+        setStyleCheck(whiteKing.x, whiteKing.y, true);
+    }
+    if (isTileAttacked(pieces, blackKing, 1)) {
+        changeLabel("Check");
+        setStyleCheck(blackKing.x, blackKing.y, true);
+    }
+}
+
 void handleClick(Position pos) {
     if (check)
         return;
@@ -405,6 +423,13 @@ void handleClick(Position pos) {
 
     if (sameSign(piece, turn)) {
         removeStyle();
+
+        if (pos.x == selectedPiecePos.x && pos.y == selectedPiecePos.y) {
+            selectedPiece = 0;
+            selectedPiecePos.x = -1;
+            selectedPiecePos.y = -1;
+            return;
+        }
 
         if (canCastle(selectedPiece, piece, selectedPiecePos, pos, turn)) {
             castle(selectedPiecePos, pos);
@@ -417,6 +442,7 @@ void handleClick(Position pos) {
         selectedPiece = piece;
 
         drawMoves(pos);
+        drawCheck();
     }
     else if (selectedPiece != 0) {
         
@@ -433,8 +459,9 @@ void handleClick(Position pos) {
             placePiece(selectedPiecePos, pos);
             explode(pieces, pos);
 
-            printf("Lost\n");
-            fflush(stdout);
+            check = true;
+            changeLabel("Lost Game");
+            return;
         }
         else if (i == 0)
             return;
@@ -454,13 +481,15 @@ void handleClick(Position pos) {
         if (attacking(pos) || (pawnMove && (pos.y == 0 || pos.y == 7))) {
             placePiece(selectedPiecePos, pos);
             if (explode(pieces, pos))   {
-                printf("lost\n");
-                fflush(stdout);
+                check = true;
+                changeLabel("Lost Game");
+                return;
             }
         }                
         else 
             placePiece(selectedPiecePos, pos);
 
+        checkIfRookMoved(pos);
         turn *= -1;
         
         removeStyle();
@@ -471,6 +500,7 @@ void handleClick(Position pos) {
         // printf("BLACK: X:%d Y:%d\n", blackKing.x, blackKing.y);
         // printf("TURN: %d\n", turn);
 
+        drawCheck();
         checkIfCheckMate(pieces, turn);
     }
 }
