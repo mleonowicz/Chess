@@ -1,4 +1,4 @@
-# Chess
+# Chess in C and GTK
 Project for CS classes
 
 # Here are rules of Atomic Chess
