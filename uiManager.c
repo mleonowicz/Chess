@@ -4,6 +4,9 @@
 Position cords[8][8];
 GtkButton *squares[8][8];
 GtkWidget *window, *chessboard, *button, *menuLayout, *label, *labelInfo;
+const int chessSize = 100;
+const int menuWidth = 500;
+const int menuHeight = 300;
 
 void loadCSS() {
     GtkCssProvider *provider = gtk_css_provider_new();
@@ -62,7 +65,7 @@ char *getPiecePath(int index) {
 void placePieceImage(int piece, int x, int y) {
     char *path = getPiecePath(piece);
 
-    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size(path, 100, 100, NULL);
+    GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file_at_size(path, chessSize, chessSize, NULL);
     GtkImage *image = (GtkImage *)gtk_image_new_from_pixbuf(pixbuf);
     gtk_button_set_image((GtkButton *)squares[x][y], (GtkWidget *)image);
 
@@ -143,8 +146,11 @@ void resetGame(GtkWidget *widget, gpointer data) {
 }
 
 void newGame(GtkWidget *widget, gpointer data) {
+    int width = 8 * chessSize;
+    int height = 9 * chessSize;
+
     gtk_container_remove(GTK_CONTAINER (window), menuLayout);
-    gtk_window_resize(GTK_WINDOW(window), 800, 900);
+    gtk_window_resize(GTK_WINDOW(window), width, height);
 
     initialize();
     initBoard();
@@ -165,7 +171,7 @@ void initBoard() {
     for (int y = 0; y < 8; y++) 
         for (int x = 0; x < 8; x++) {
             button = gtk_button_new();
-            gtk_widget_set_size_request(button, 100, 100);
+            gtk_widget_set_size_request(button, chessSize, chessSize);
 
             if ((x + y) % 2 == 0) 
                 gtk_widget_set_name(button, "black");
@@ -184,7 +190,7 @@ void initBoard() {
 
     //exit button
     button = gtk_button_new();
-    gtk_widget_set_size_request(button, 190, 100);
+    gtk_widget_set_size_request(button, chessSize * 2, chessSize);
     g_signal_connect(button, "clicked",
 		      G_CALLBACK(createMenu), NULL);
 
@@ -198,7 +204,7 @@ void initBoard() {
 
     //reset button
     button = gtk_button_new();
-    gtk_widget_set_size_request(button, 190, 100);
+    gtk_widget_set_size_request(button, chessSize * 2, chessSize);
     g_signal_connect(button, "clicked",
 		      G_CALLBACK(resetGame), NULL);
 
@@ -212,7 +218,7 @@ void initBoard() {
 
     //adding label
     labelInfo = gtk_label_new("WHITE");
-    gtk_widget_set_size_request(labelInfo, 400, 100);
+    gtk_widget_set_size_request(labelInfo, chessSize * 4, chessSize);
     gtk_widget_set_name(labelInfo, "infoWhite");
 
     gtk_grid_attach((GtkGrid *)chessboard, labelInfo, 4, 8, 4, 1);
@@ -226,7 +232,7 @@ void createMenu() {
     if (gtk_container_get_children(GTK_CONTAINER(window)) != NULL)
         gtk_container_remove(GTK_CONTAINER(window), chessboard);
         
-    gtk_window_resize(GTK_WINDOW(window), 500, 300);
+    gtk_window_resize(GTK_WINDOW(window), menuWidth, menuHeight);
     
     menuLayout = gtk_grid_new();
     gtk_widget_set_name(menuLayout, "menuLayout");
@@ -234,12 +240,12 @@ void createMenu() {
     //title
     label = gtk_label_new("Atomic Chess");
     gtk_widget_set_name(label, "title");
-    gtk_widget_set_size_request(label, 500, 100);
+    gtk_widget_set_size_request(label, menuWidth, menuHeight / 3);
     gtk_grid_attach((GtkGrid *)menuLayout, label, 0, 0, 1, 1);
 
     //exit button
     button = gtk_button_new();
-    gtk_widget_set_size_request(button, 490, 100);
+    gtk_widget_set_size_request(button, menuWidth, menuHeight / 3);
     g_signal_connect(button, "clicked",
 		      G_CALLBACK(close_window), NULL);
 
@@ -253,7 +259,7 @@ void createMenu() {
 
     //new game button
     button = gtk_button_new();
-    gtk_widget_set_size_request(button, 490, 100);
+    gtk_widget_set_size_request(button, menuWidth, menuHeight / 3);
     g_signal_connect(button, "clicked",
 		      G_CALLBACK (newGame), NULL);
 
@@ -274,7 +280,7 @@ int main(int argc, char **argv) {
     loadCSS();
 
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_default_size(GTK_WINDOW(window), 500, 300);
+    gtk_window_set_default_size(GTK_WINDOW(window), menuWidth, menuHeight);
 
     gtk_window_set_title((GtkWindow *)window, "Atomic chess");
     gtk_window_set_resizable((GtkWindow *)window, FALSE);
